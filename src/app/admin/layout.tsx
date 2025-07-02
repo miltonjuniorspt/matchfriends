@@ -68,7 +68,7 @@ function AdminSidebar() {
       <SidebarHeader>
         <div className="flex items-center gap-2" data-testid="logo">
           <HeartHandshake className="w-8 h-8 text-primary" />
-          <span className="text-xl font-bold font-headline">Amigo Romântico</span>
+          <span className="text-xl font-bold font-headline">Match Friends</span>
         </div>
       </SidebarHeader>
       <SidebarContent>

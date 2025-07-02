@@ -31,7 +31,7 @@ export default function UsersPage() {
         <div className="flex justify-between items-center">
             <div>
                 <CardTitle>Usuários</CardTitle>
-                <CardDescription>Gerencie as contas dos usuários do Amigo Romântico.</CardDescription>
+                <CardDescription>Gerencie as contas dos usuários do Match Friends.</CardDescription>
             </div>
             <Button>Adicionar Usuário</Button>
         </div>
