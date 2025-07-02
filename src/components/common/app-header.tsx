@@ -42,7 +42,6 @@ export function AppHeader() {
   const pathname = usePathname();
   const router = useRouter();
   const [userName, setUserName] = React.useState("Usuário");
-  const [userEmail, setUserEmail] = React.useState("usuario@exemplo.com");
 
   React.useEffect(() => {
     try {
@@ -50,7 +49,6 @@ export function AppHeader() {
       if (storedUser) {
         const user = JSON.parse(storedUser);
         setUserName(user.name || "Usuário");
-        setUserEmail(user.email || "usuario@exemplo.com");
       }
     } catch (error) {
       console.error("Falha ao ler dados do localStorage", error);
@@ -141,9 +139,6 @@ export function AppHeader() {
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm font-medium leading-none">{userName}</p>
-                  <p className="text-xs leading-none text-muted-foreground">
-                    {userEmail}
-                  </p>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
