@@ -6,53 +6,72 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Send, Search } from 'lucide-react';
+import { Send, Search, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-// Dados de exemplo
-const conversations = [
-  { 
-    id: 1, 
-    name: 'Juliana, 25', 
-    avatar: 'https://placehold.co/100x100', 
-    dataAiHint: 'woman portrait',
-    lastMessage: 'Que legal! 😄',
-    lastMessageTime: '10:42',
-    online: true,
-  },
-  { 
-    id: 2, 
-    name: 'Fernando, 29', 
-    avatar: 'https://placehold.co/100x100', 
-    dataAiHint: 'man portrait',
-    lastMessage: 'Combinado então!',
-    lastMessageTime: 'Ontem',
-    online: false,
-  },
-  { 
-    id: 3, 
-    name: 'Carla, 22', 
-    avatar: 'https://placehold.co/100x100', 
-    dataAiHint: 'woman portrait smiling',
-    lastMessage: 'hahaha, pode deixar',
-    lastMessageTime: '2d',
-    online: false,
-  }
-];
 
 const initialMessages = [
-  { id: 1, text: "Olá! Tudo bem? Gostei do seu perfil 😊", sender: 'Juliana, 25' },
+  { id: 1, text: "Olá! Tudo bem? Gostei do seu perfil 😊", sender: 'other' },
   { id: 2, text: "Oii, tudo ótimo e com você? Obrigado! Também gostei do seu.", sender: 'me' },
-  { id: 3, text: "Tudo bem também! O que você mais gosta de fazer no seu tempo livre?", sender: 'Juliana, 25' },
+  { id: 3, text: "Tudo bem também! O que você mais gosta de fazer no seu tempo livre?", sender: 'other' },
   { id: 4, text: "Gosto muito de ir à praia, ler um bom livro e sair pra conhecer lugares novos. E você?", sender: 'me' },
-  { id: 5, text: "Que legal! 😄", sender: 'Juliana, 25' },
+  { id: 5, text: "Que legal! 😄", sender: 'other' },
 ];
 
 export default function MessagesPage() {
-    const [messages, setMessages] = useState(initialMessages);
+    const [messages, setMessages] = useState<any[]>([]);
     const [newMessage, setNewMessage] = useState('');
-    const [activeConversation, setActiveConversation] = useState(conversations[0]);
+    const [activeConversation, setActiveConversation] = useState<any>(null);
+    const [conversations, setConversations] = useState<any[]>([]);
+    const [currentUserAvatar, setCurrentUserAvatar] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+
     const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        try {
+            const storedUsersRaw = localStorage.getItem("users");
+            const storedUserRaw = localStorage.getItem("user");
+
+            if (storedUsersRaw && storedUserRaw) {
+                const allUsers = JSON.parse(storedUsersRaw);
+                const loggedInUser = JSON.parse(storedUserRaw);
+                
+                setCurrentUserAvatar(loggedInUser.avatar);
+
+                const otherUsers = allUsers.filter((u: any) => u.email !== loggedInUser.email);
+                
+                const conversationList = otherUsers.map((user: any, index: number) => ({
+                    id: user.email,
+                    name: user.name,
+                    avatar: user.avatar || 'https://placehold.co/100x100',
+                    dataAiHint: 'person portrait',
+                    lastMessage: ['Que legal! 😄', 'Combinado então!', 'hahaha, pode deixar', 'Até mais!'][index % 4],
+                    lastMessageTime: ['10:42', 'Ontem', '2d', '3d'][index % 4],
+                    online: index % 2 === 0,
+                }));
+                
+                setConversations(conversationList);
+                if (conversationList.length > 0) {
+                    setActiveConversation(conversationList[0]);
+                }
+            }
+        } catch (error) {
+            console.error("Falha ao carregar conversas do localStorage", error);
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+    
+    useEffect(() => {
+        if (activeConversation) {
+            const dynamicMessages = initialMessages.map(msg => ({
+                ...msg,
+                sender: msg.sender === 'me' ? 'me' : activeConversation.name,
+            }));
+            setMessages(dynamicMessages);
+        }
+    }, [activeConversation]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -62,7 +81,7 @@ export default function MessagesPage() {
 
     const handleSendMessage = (e: React.FormEvent) => {
         e.preventDefault();
-        if (newMessage.trim() === '') return;
+        if (newMessage.trim() === '' || !activeConversation) return;
 
         const myMessage = {
             id: messages.length + 1,
@@ -84,8 +103,32 @@ export default function MessagesPage() {
         }, 1500);
     };
 
+    if (isLoading) {
+        return (
+            <div className="flex w-full items-center justify-center py-8">
+                <Loader2 className="h-16 w-16 animate-spin text-primary" />
+            </div>
+        );
+    }
+    
+    if (conversations.length === 0) {
+        return (
+            <div className="flex w-full items-center justify-center py-8">
+                <p className="text-muted-foreground">Nenhum outro usuário cadastrado para conversar.</p>
+            </div>
+        );
+    }
+    
+    if (!activeConversation) {
+        return (
+             <div className="flex w-full items-center justify-center py-8">
+                <p className="text-muted-foreground">Selecione uma conversa para começar.</p>
+            </div>
+        )
+    }
+
     return (
-        <div className="flex w-full flex-1 gap-4">
+        <div className="flex w-full flex-1 gap-4 py-8">
             {/* Lista de Conversas */}
             <Card className="hidden w-[300px] flex-col md:flex lg:w-[350px]">
                 <CardHeader className="border-b p-4">
@@ -141,8 +184,8 @@ export default function MessagesPage() {
                 <CardContent className="flex-1 overflow-hidden p-0">
                     <ScrollArea className="h-full">
                         <div className="space-y-6 p-4">
-                            {messages.map((msg) => (
-                                <div key={msg.id} className={cn("flex w-full items-end gap-2", msg.sender === 'me' ? 'justify-end' : 'justify-start')}>
+                            {messages.map((msg, index) => (
+                                <div key={index} className={cn("flex w-full items-end gap-2", msg.sender === 'me' ? 'justify-end' : 'justify-start')}>
                                     {msg.sender !== 'me' && 
                                         <Avatar className="h-8 w-8">
                                             <AvatarImage src={activeConversation.avatar} data-ai-hint={activeConversation.dataAiHint} />
@@ -157,7 +200,7 @@ export default function MessagesPage() {
                                     </div>
                                     {msg.sender === 'me' && 
                                         <Avatar className="h-8 w-8">
-                                            <AvatarImage src="https://placehold.co/100x100" data-ai-hint="person portrait" />
+                                            <AvatarImage src={currentUserAvatar || "https://placehold.co/100x100"} data-ai-hint="person portrait" />
                                             <AvatarFallback>EU</AvatarFallback>
                                         </Avatar>
                                     }
