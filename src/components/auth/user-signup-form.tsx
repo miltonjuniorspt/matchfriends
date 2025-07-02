@@ -49,14 +49,31 @@ export function UserSignupForm() {
     setIsLoading(true);
     // Simula uma chamada de rede e registro
     setTimeout(() => {
-      // Em um aplicativo real, você salvaria o usuário no banco de dados
-      console.log(values);
-      toast({
-        title: "Cadastro realizado com sucesso!",
-        description: "Redirecionando para a página inicial.",
-      });
-      router.push("/home");
-      setIsLoading(false);
+      try {
+        // Para esta demonstração, usamos o localStorage.
+        // ATENÇÃO: Armazenar senhas em texto puro não é seguro para produção.
+        localStorage.setItem("user", JSON.stringify({
+          name: values.name,
+          email: values.email,
+          password: values.password,
+        }));
+        
+        toast({
+          title: "Cadastro realizado com sucesso!",
+          description: "Redirecionando para a página inicial.",
+        });
+        router.push("/home");
+
+      } catch (error) {
+        console.error("Falha ao salvar usuário no localStorage", error);
+        toast({
+          variant: "destructive",
+          title: "Erro no cadastro",
+          description: "Não foi possível salvar seus dados. Tente novamente.",
+        });
+      } finally {
+        setIsLoading(false);
+      }
     }, 1500);
   }
 

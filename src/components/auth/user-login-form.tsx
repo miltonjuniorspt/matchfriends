@@ -44,7 +44,28 @@ export function UserLoginForm() {
     setIsLoading(true);
     // Simula uma chamada de rede e login
     setTimeout(() => {
-      if (values.email === DEMO_USER_EMAIL && values.password === DEMO_USER_PASS) {
+      let loggedIn = false;
+      let registeredUser;
+      
+      try {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          registeredUser = JSON.parse(storedUser);
+        }
+      } catch (error) {
+        console.error("Falha ao ler dados do localStorage", error);
+      }
+      
+      // Verifica primeiro se o usuário cadastrado corresponde
+      if (registeredUser && values.email === registeredUser.email && values.password === registeredUser.password) {
+        loggedIn = true;
+      } 
+      // Como alternativa, usa o usuário de demonstração padrão
+      else if (values.email === DEMO_USER_EMAIL && values.password === DEMO_USER_PASS) {
+        loggedIn = true;
+      }
+
+      if (loggedIn) {
         toast({
           title: "Login bem-sucedido!",
           description: "Redirecionando para a página inicial.",
