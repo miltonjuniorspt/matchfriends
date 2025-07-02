@@ -88,7 +88,7 @@ export default function MessagesPage() {
     return (
         <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] lg:grid-cols-[350px_1fr] gap-4 h-[calc(100vh-10rem)]">
             {/* Lista de Conversas */}
-            <Card className="hidden md:flex md:flex-col">
+            <Card className="hidden md:flex md:flex-col h-full">
                 <CardHeader className="p-4 border-b">
                     <div className="relative">
                         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -125,7 +125,7 @@ export default function MessagesPage() {
             </Card>
 
             {/* Janela de Bate-papo */}
-            <Card className="flex flex-col flex-1">
+            <Card className="flex flex-col h-full">
                 <CardHeader className="flex flex-row items-center gap-4 p-4 border-b">
                      <div className="relative">
                         <Avatar className="h-10 w-10">
