@@ -45,11 +45,12 @@ export function UserLoginForm() {
     // Simula uma chamada de rede e login
     setTimeout(() => {
       let loggedIn = false;
-      let userToLogin = null;
+      let userToLogin: any = null;
+      let users: any[] = [];
       
       try {
         const storedUsers = localStorage.getItem("users");
-        const users = storedUsers ? JSON.parse(storedUsers) : [];
+        users = storedUsers ? JSON.parse(storedUsers) : [];
 
         const foundUser = users.find((u: any) => u.email === values.email);
 
@@ -60,18 +61,18 @@ export function UserLoginForm() {
         // Como alternativa, usa o usuário de demonstração padrão
         else if (values.email === DEMO_USER_EMAIL && values.password === DEMO_USER_PASS) {
           loggedIn = true;
-          userToLogin = {
-                name: "Usuário Demo",
-                email: DEMO_USER_EMAIL,
-                password: DEMO_USER_PASS,
-                avatar: null,
-                photos: []
-            };
-          // Configura o localStorage para o usuário de demonstração, se não estiver presente
-          const demoUserExists = users.some((user: any) => user.email === DEMO_USER_EMAIL);
-          if (!demoUserExists) {
+          const demoUserIndex = users.findIndex((user: any) => user.email === DEMO_USER_EMAIL);
+          if (demoUserIndex === -1) {
+              userToLogin = {
+                  name: "Usuário Demo",
+                  email: DEMO_USER_EMAIL,
+                  password: DEMO_USER_PASS,
+                  avatar: null,
+                  photos: []
+              };
               users.push(userToLogin);
-              localStorage.setItem("users", JSON.stringify(users));
+          } else {
+              userToLogin = users[demoUserIndex];
           }
         }
       } catch (error) {
@@ -79,18 +80,33 @@ export function UserLoginForm() {
       }
       
       if (loggedIn && userToLogin) {
-        // Objeto de sessão leve, sem a lista de fotos.
+        // Para resolver o problema de cota e atender ao pedido de limpeza,
+        // limpamos o avatar e as fotos do usuário no momento do login.
+        // Isso permite que o usuário envie novamente as imagens compactadas.
+        const userIndex = users.findIndex((u: any) => u.email === userToLogin.email);
+        if (userIndex > -1) {
+            users[userIndex].avatar = null;
+            users[userIndex].photos = [];
+        }
+
+        try {
+            localStorage.setItem("users", JSON.stringify(users));
+        } catch (error) {
+            console.error("Falha ao limpar e salvar a lista de usuários.", error);
+        }
+
         const sessionUser = {
             name: userToLogin.name,
             email: userToLogin.email,
             password: userToLogin.password,
-            avatar: userToLogin.avatar,
+            avatar: null, // Garante que a sessão também esteja limpa
         };
 
         localStorage.setItem("user", JSON.stringify(sessionUser));
+        
         toast({
           title: "Login bem-sucedido!",
-          description: "Redirecionando para o bate-papo.",
+          description: "Redirecionando... Suas fotos antigas foram removidas para que você possa enviá-las novamente.",
         });
         router.push("/messages");
       } else {
