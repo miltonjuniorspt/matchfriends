@@ -100,12 +100,3 @@ export default function MusicManagementPage() {
     </Card>
   );
 }
-
-// Dummy List component for structure
-// In a real app, this would be a proper styled component
-const List = ({ children, className }: { children: React.ReactNode, className?: string }) => (
-    <ul className={`border rounded-md divide-y ${className}`}>{children}</ul>
-);
-const ListItem = ({ children, className }: { children: React.ReactNode, className?: string }) => (
-    <li className={`p-3 ${className}`}>{children}</li>
-);
