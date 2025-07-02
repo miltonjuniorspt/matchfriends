@@ -86,35 +86,35 @@ export default function MessagesPage() {
     };
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] lg:grid-cols-[350px_1fr] gap-4 h-[calc(100vh-10rem)]">
+        <div className="grid flex-1 grid-cols-1 gap-4 md:grid-cols-[300px_1fr] lg:grid-cols-[350px_1fr]">
             {/* Lista de Conversas */}
-            <Card className="hidden md:flex md:flex-col h-full">
-                <CardHeader className="p-4 border-b">
+            <Card className="hidden h-full md:flex md:flex-col">
+                <CardHeader className="border-b p-4">
                     <div className="relative">
                         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                         <Input placeholder="Buscar conversas..." className="pl-8" />
                     </div>
                 </CardHeader>
-                <CardContent className="p-0 flex-1">
+                <CardContent className="flex-1 p-0">
                     <ScrollArea className="h-full">
-                        <div className="p-2 space-y-1">
+                        <div className="space-y-1 p-2">
                             {conversations.map((convo) => (
                                 <Button
                                     key={convo.id}
                                     variant={activeConversation.id === convo.id ? 'secondary' : 'ghost'}
-                                    className="w-full h-auto justify-start p-3"
+                                    className="h-auto w-full justify-start p-3"
                                     onClick={() => setActiveConversation(convo)}
                                 >
                                     <div className="relative">
-                                        <Avatar className="h-10 w-10 mr-4">
+                                        <Avatar className="mr-4 h-10 w-10">
                                             <AvatarImage src={convo.avatar} data-ai-hint={convo.dataAiHint} />
                                             <AvatarFallback>{convo.name.substring(0, 2).toUpperCase()}</AvatarFallback>
                                         </Avatar>
-                                        {convo.online && <div className="absolute bottom-0 right-4 w-3 h-3 bg-green-500 border-2 border-background rounded-full"></div>}
+                                        {convo.online && <div className="absolute bottom-0 right-4 h-3 w-3 rounded-full border-2 border-background bg-green-500"></div>}
                                     </div>
                                     <div className="flex-1 text-left">
                                         <p className="font-semibold">{convo.name}</p>
-                                        <p className="text-sm text-muted-foreground truncate">{convo.lastMessage}</p>
+                                        <p className="truncate text-sm text-muted-foreground">{convo.lastMessage}</p>
                                     </div>
                                     <span className="text-xs text-muted-foreground">{convo.lastMessageTime}</span>
                                 </Button>
@@ -125,23 +125,23 @@ export default function MessagesPage() {
             </Card>
 
             {/* Janela de Bate-papo */}
-            <Card className="flex flex-col h-full">
-                <CardHeader className="flex flex-row items-center gap-4 p-4 border-b">
+            <Card className="flex h-full flex-col">
+                <CardHeader className="flex flex-row items-center gap-4 border-b p-4">
                      <div className="relative">
                         <Avatar className="h-10 w-10">
                             <AvatarImage src={activeConversation.avatar} data-ai-hint={activeConversation.dataAiHint} />
                             <AvatarFallback>{activeConversation.name.substring(0, 2).toUpperCase()}</AvatarFallback>
                         </Avatar>
-                         {activeConversation.online && <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-card rounded-full"></div>}
+                         {activeConversation.online && <div className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-card bg-green-500"></div>}
                     </div>
                     <div className="flex flex-col">
                         <h2 className="text-lg font-semibold">{activeConversation.name}</h2>
                         {activeConversation.online && <p className="text-sm text-green-500">Online</p>}
                     </div>
                 </CardHeader>
-                <CardContent className="flex-1 p-0 overflow-hidden">
+                <CardContent className="flex-1 overflow-hidden p-0">
                     <ScrollArea className="h-full">
-                        <div className="p-4 space-y-6">
+                        <div className="space-y-6 p-4">
                             {messages.map((msg) => (
                                 <div key={msg.id} className={cn("flex w-full items-end gap-2", msg.sender === 'me' ? 'justify-end' : 'justify-start')}>
                                     {msg.sender !== 'me' && 
@@ -168,7 +168,7 @@ export default function MessagesPage() {
                         </div>
                     </ScrollArea>
                 </CardContent>
-                <CardFooter className="p-4 border-t bg-background">
+                <CardFooter className="border-t bg-background p-4">
                     <form onSubmit={handleSendMessage} className="flex w-full items-center space-x-2">
                         <Input 
                             id="message" 
