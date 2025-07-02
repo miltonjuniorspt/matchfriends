@@ -17,8 +17,8 @@ export default function SignupPage() {
         <CardContent>
           <UserSignupForm />
         </CardContent>
-        <CardFooter className="justify-center">
-           <p className="text-sm text-muted-foreground">
+        <CardFooter className="flex-col gap-4">
+           <p className="text-center text-sm text-muted-foreground">
             Já tem uma conta?{" "}
             <Link href="/login" className="font-semibold text-primary hover:underline">
               Faça login
