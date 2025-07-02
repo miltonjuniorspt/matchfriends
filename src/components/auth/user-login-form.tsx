@@ -79,7 +79,15 @@ export function UserLoginForm() {
       }
       
       if (loggedIn && userToLogin) {
-        localStorage.setItem("user", JSON.stringify(userToLogin));
+        // Objeto de sessão leve, sem a lista de fotos.
+        const sessionUser = {
+            name: userToLogin.name,
+            email: userToLogin.email,
+            password: userToLogin.password,
+            avatar: userToLogin.avatar,
+        };
+
+        localStorage.setItem("user", JSON.stringify(sessionUser));
         toast({
           title: "Login bem-sucedido!",
           description: "Redirecionando para o bate-papo.",

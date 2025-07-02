@@ -78,9 +78,16 @@ export function UserSignupForm() {
         };
         
         users.push(newUser);
-
         localStorage.setItem("users", JSON.stringify(users));
-        localStorage.setItem("user", JSON.stringify(newUser));
+        
+        // Objeto de sessão leve
+        const sessionUser = {
+            name: newUser.name,
+            email: newUser.email,
+            password: newUser.password,
+            avatar: newUser.avatar,
+        };
+        localStorage.setItem("user", JSON.stringify(sessionUser));
         
         toast({
           title: "Cadastro realizado com sucesso!",

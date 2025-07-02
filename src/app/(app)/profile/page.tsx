@@ -30,10 +30,17 @@ export default function ProfilePage() {
   useEffect(() => {
     setIsMounted(true); // Previne erro de hidratação
     try {
-      const storedUser = localStorage.getItem("user");
-      if (storedUser) {
-        const user = JSON.parse(storedUser);
-        setPhotos(user.photos || []);
+      const storedUserRaw = localStorage.getItem("user");
+      const storedUsersRaw = localStorage.getItem("users");
+      
+      if (storedUserRaw && storedUsersRaw) {
+        const currentUser = JSON.parse(storedUserRaw);
+        const users = JSON.parse(storedUsersRaw);
+        const fullUser = users.find((u: any) => u.email === currentUser.email);
+        
+        if (fullUser) {
+          setPhotos(fullUser.photos || []);
+        }
       }
     } catch (error) {
       console.error("Falha ao carregar fotos do localStorage", error);
@@ -46,16 +53,13 @@ export default function ProfilePage() {
       if (!storedUserRaw) return;
       
       const currentUser = JSON.parse(storedUserRaw);
-      currentUser.photos = newPhotos;
       
-      localStorage.setItem("user", JSON.stringify(currentUser));
-
       const storedUsersRaw = localStorage.getItem("users");
       const users = storedUsersRaw ? JSON.parse(storedUsersRaw) : [];
       const userIndex = users.findIndex((u: any) => u.email === currentUser.email);
 
       if (userIndex > -1) {
-        users[userIndex] = currentUser;
+        users[userIndex].photos = newPhotos;
         localStorage.setItem("users", JSON.stringify(users));
       }
     } catch (error) {
