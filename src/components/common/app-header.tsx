@@ -35,7 +35,7 @@ import {
 const navLinks = [
   { href: "/home", label: "Início", icon: Home },
   { href: "/profiles", label: "Perfis", icon: Users },
-  { href: "/messages", label: "Mensagens", icon: MessageSquare },
+  { href: "/messages", label: "Bate papo", icon: MessageSquare },
 ];
 
 export function AppHeader() {
