@@ -41,6 +41,21 @@ const navLinks = [
 export function AppHeader() {
   const pathname = usePathname();
   const router = useRouter();
+  const [userName, setUserName] = React.useState("Usuário");
+  const [userEmail, setUserEmail] = React.useState("usuario@exemplo.com");
+
+  React.useEffect(() => {
+    try {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        const user = JSON.parse(storedUser);
+        setUserName(user.name || "Usuário");
+        setUserEmail(user.email || "usuario@exemplo.com");
+      }
+    } catch (error) {
+      console.error("Falha ao ler dados do localStorage", error);
+    }
+  }, []);
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background">
@@ -118,16 +133,16 @@ export function AppHeader() {
               <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                 <Avatar className="h-9 w-9">
                   <AvatarImage src="https://placehold.co/100x100" alt="@user" />
-                  <AvatarFallback>U</AvatarFallback>
+                  <AvatarFallback>{userName.substring(0, 1).toUpperCase()}</AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end" forceMount>
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">Usuário</p>
+                  <p className="text-sm font-medium leading-none">{userName}</p>
                   <p className="text-xs leading-none text-muted-foreground">
-                    usuario@exemplo.com
+                    {userEmail}
                   </p>
                 </div>
               </DropdownMenuLabel>
