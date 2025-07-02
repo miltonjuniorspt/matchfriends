@@ -14,6 +14,7 @@ import {
   User,
   Users,
   Camera,
+  Album,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -36,6 +37,7 @@ import {
 
 const navLinks = [
   { href: "/home", label: "Início", icon: Home },
+  { href: "/profile", label: "Álbum", icon: Album },
   { href: "/profiles", label: "Perfis", icon: Users },
   { href: "/messages", label: "Bate papo", icon: MessageSquare },
 ];
