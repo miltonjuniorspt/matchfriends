@@ -46,11 +46,10 @@ export function UserLoginForm() {
     setTimeout(() => {
       let loggedIn = false;
       let userToLogin: any = null;
-      let users: any[] = [];
       
       try {
         const storedUsers = localStorage.getItem("users");
-        users = storedUsers ? JSON.parse(storedUsers) : [];
+        const users = storedUsers ? JSON.parse(storedUsers) : [];
 
         const foundUser = users.find((u: any) => u.email === values.email);
 
@@ -71,6 +70,7 @@ export function UserLoginForm() {
                   photos: []
               };
               users.push(userToLogin);
+              localStorage.setItem("users", JSON.stringify(users));
           } else {
               userToLogin = users[demoUserIndex];
           }
@@ -80,33 +80,19 @@ export function UserLoginForm() {
       }
       
       if (loggedIn && userToLogin) {
-        // Para resolver o problema de cota e atender ao pedido de limpeza,
-        // limpamos o avatar e as fotos do usuário no momento do login.
-        // Isso permite que o usuário envie novamente as imagens compactadas.
-        const userIndex = users.findIndex((u: any) => u.email === userToLogin.email);
-        if (userIndex > -1) {
-            users[userIndex].avatar = null;
-            users[userIndex].photos = [];
-        }
-
-        try {
-            localStorage.setItem("users", JSON.stringify(users));
-        } catch (error) {
-            console.error("Falha ao limpar e salvar a lista de usuários.", error);
-        }
-
+        // O objeto de sessão contém apenas os dados essenciais do usuário
         const sessionUser = {
             name: userToLogin.name,
             email: userToLogin.email,
             password: userToLogin.password,
-            avatar: null, // Garante que a sessão também esteja limpa
+            avatar: userToLogin.avatar || null,
         };
 
         localStorage.setItem("user", JSON.stringify(sessionUser));
         
         toast({
           title: "Login bem-sucedido!",
-          description: "Redirecionando... Suas fotos antigas foram removidas para que você possa enviá-las novamente.",
+          description: "Redirecionando para o bate-papo.",
         });
         router.push("/messages");
       } else {
