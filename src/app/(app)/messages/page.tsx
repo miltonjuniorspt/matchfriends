@@ -91,16 +91,6 @@ export default function MessagesPage() {
 
         setMessages(prev => [...prev, myMessage]);
         setNewMessage('');
-
-        // Simula uma resposta
-        setTimeout(() => {
-            const replyMessage = {
-                id: messages.length + 3,
-                text: "Adorei a resposta! 😁",
-                sender: activeConversation.name,
-            };
-            setMessages(prev => [...prev, replyMessage]);
-        }, 1500);
     };
 
     if (isLoading) {
