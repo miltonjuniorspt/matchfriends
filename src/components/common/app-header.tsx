@@ -15,6 +15,7 @@ import {
   Users,
   Camera,
   Album,
+  KeyRound,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -194,6 +195,10 @@ export function AppHeader() {
               <DropdownMenuItem onClick={handleUploadClick}>
                 <Camera className="mr-2 h-4 w-4" />
                 <span>Alterar Foto</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push('/profile/change-password')}>
+                <KeyRound className="mr-2 h-4 w-4" />
+                <span>Alterar Senha</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => router.push("/login")}>
