@@ -138,8 +138,7 @@ export function AppHeader() {
           </Sheet>
         </div>
 
-        <div className="flex items-center space-x-4">
-          <nav className="hidden gap-6 md:flex">
+        <nav className="hidden items-center gap-6 md:flex">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -152,8 +151,9 @@ export function AppHeader() {
                 {link.label}
               </Link>
             ))}
-          </nav>
+        </nav>
 
+        <div className="flex items-center space-x-4">
           <Button variant="ghost" size="icon">
             <Bell className="h-5 w-5" />
             <span className="sr-only">Notificações</span>
