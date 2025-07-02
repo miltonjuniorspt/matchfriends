@@ -23,6 +23,9 @@ const formSchema = z.object({
   password: z.string().min(1, { message: "A senha é obrigatória." }),
 });
 
+const DEMO_USER_EMAIL = "usuario@exemplo.com";
+const DEMO_USER_PASS = "senha123";
+
 export function UserLoginForm() {
   const router = useRouter();
   const { toast } = useToast();
@@ -41,12 +44,23 @@ export function UserLoginForm() {
     setIsLoading(true);
     // Simula uma chamada de rede e login
     setTimeout(() => {
-      // Em um aplicativo real, você validaria os dados com um banco de dados
-      toast({
-        title: "Login bem-sucedido!",
-        description: "Redirecionando para a página inicial.",
-      });
-      router.push("/home");
+      if (values.email === DEMO_USER_EMAIL && values.password === DEMO_USER_PASS) {
+        toast({
+          title: "Login bem-sucedido!",
+          description: "Redirecionando para a página inicial.",
+        });
+        router.push("/home");
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Erro de login",
+          description: "Email ou senha incorretos. Por favor, tente novamente.",
+        });
+        form.setError("password", {
+          type: "manual",
+          message: "Email ou senha incorretos.",
+        });
+      }
       setIsLoading(false);
     }, 1500);
   }
