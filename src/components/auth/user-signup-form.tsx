@@ -56,6 +56,7 @@ export function UserSignupForm() {
           name: values.name,
           email: values.email,
           password: values.password,
+          avatar: null, // Inicializa o avatar como nulo
         }));
         
         toast({

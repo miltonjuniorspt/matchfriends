@@ -12,6 +12,7 @@ import {
   MessageSquare,
   User,
   Users,
+  Camera,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -42,6 +43,8 @@ export function AppHeader() {
   const pathname = usePathname();
   const router = useRouter();
   const [userName, setUserName] = React.useState("Usuário");
+  const [userAvatar, setUserAvatar] = React.useState<string | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
     try {
@@ -49,11 +52,38 @@ export function AppHeader() {
       if (storedUser) {
         const user = JSON.parse(storedUser);
         setUserName(user.name || "Usuário");
+        setUserAvatar(user.avatar || null); // Load avatar from storage
       }
     } catch (error) {
       console.error("Falha ao ler dados do localStorage", error);
     }
   }, []);
+  
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const dataUrl = reader.result as string;
+        setUserAvatar(dataUrl);
+        // Save to localStorage
+        try {
+          const storedUser = localStorage.getItem("user");
+          const user = storedUser ? JSON.parse(storedUser) : {};
+          user.avatar = dataUrl;
+          localStorage.setItem("user", JSON.stringify(user));
+        } catch (error) {
+          console.error("Falha ao salvar avatar no localStorage", error);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background">
@@ -130,7 +160,7 @@ export function AppHeader() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                 <Avatar className="h-9 w-9">
-                  <AvatarImage src="https://placehold.co/100x100" alt="@user" />
+                  <AvatarImage src={userAvatar || "https://placehold.co/100x100"} alt="@user" data-ai-hint="person portrait" />
                   <AvatarFallback>{userName.substring(0, 1).toUpperCase()}</AvatarFallback>
                 </Avatar>
               </Button>
@@ -146,6 +176,10 @@ export function AppHeader() {
                 <User className="mr-2 h-4 w-4" />
                 <span>Meu Perfil</span>
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleUploadClick}>
+                <Camera className="mr-2 h-4 w-4" />
+                <span>Alterar Foto</span>
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => router.push("/login")}>
                 <LogOut className="mr-2 h-4 w-4" />
@@ -153,6 +187,13 @@ export function AppHeader() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            className="hidden"
+            accept="image/*"
+          />
         </div>
       </div>
     </header>

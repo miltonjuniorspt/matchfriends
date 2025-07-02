@@ -63,6 +63,15 @@ export function UserLoginForm() {
       // Como alternativa, usa o usuário de demonstração padrão
       else if (values.email === DEMO_USER_EMAIL && values.password === DEMO_USER_PASS) {
         loggedIn = true;
+        // Configura o localStorage para o usuário de demonstração, se não estiver presente
+        if (!registeredUser || registeredUser.email !== DEMO_USER_EMAIL) {
+            localStorage.setItem("user", JSON.stringify({
+                name: "Usuário Demo",
+                email: DEMO_USER_EMAIL,
+                password: DEMO_USER_PASS,
+                avatar: null
+            }));
+        }
       }
 
       if (loggedIn) {
