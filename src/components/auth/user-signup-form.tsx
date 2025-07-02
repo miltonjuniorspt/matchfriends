@@ -50,14 +50,37 @@ export function UserSignupForm() {
     // Simula uma chamada de rede e registro
     setTimeout(() => {
       try {
-        // Para esta demonstração, usamos o localStorage.
-        // ATENÇÃO: Armazenar senhas em texto puro não é seguro para produção.
-        localStorage.setItem("user", JSON.stringify({
+        const storedUsers = localStorage.getItem("users");
+        const users = storedUsers ? JSON.parse(storedUsers) : [];
+
+        const emailExists = users.some((user: any) => user.email === values.email);
+
+        if (emailExists) {
+          toast({
+            variant: "destructive",
+            title: "Erro de cadastro",
+            description: "Este e-mail já está em uso.",
+          });
+          form.setError("email", {
+            type: "manual",
+            message: "Este e-mail já está em uso.",
+          });
+          setIsLoading(false);
+          return;
+        }
+
+        const newUser = {
           name: values.name,
           email: values.email,
-          password: values.password,
-          avatar: null, // Inicializa o avatar como nulo
-        }));
+          password: values.password, // ATENÇÃO: Armazenar senhas em texto puro não é seguro para produção.
+          avatar: null,
+          photos: [],
+        };
+        
+        users.push(newUser);
+
+        localStorage.setItem("users", JSON.stringify(users));
+        localStorage.setItem("user", JSON.stringify(newUser));
         
         toast({
           title: "Cadastro realizado com sucesso!",

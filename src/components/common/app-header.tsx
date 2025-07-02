@@ -71,10 +71,19 @@ export function AppHeader() {
         setUserAvatar(dataUrl);
         // Save to localStorage
         try {
-          const storedUser = localStorage.getItem("user");
-          const user = storedUser ? JSON.parse(storedUser) : {};
-          user.avatar = dataUrl;
-          localStorage.setItem("user", JSON.stringify(user));
+          const storedUserRaw = localStorage.getItem("user");
+          if (!storedUserRaw) return;
+          const currentUser = JSON.parse(storedUserRaw);
+          currentUser.avatar = dataUrl;
+          localStorage.setItem("user", JSON.stringify(currentUser));
+
+          const storedUsersRaw = localStorage.getItem("users");
+          const users = storedUsersRaw ? JSON.parse(storedUsersRaw) : [];
+          const userIndex = users.findIndex((u: any) => u.email === currentUser.email);
+          if (userIndex > -1) {
+            users[userIndex] = currentUser;
+            localStorage.setItem("users", JSON.stringify(users));
+          }
         } catch (error) {
           console.error("Falha ao salvar avatar no localStorage", error);
         }

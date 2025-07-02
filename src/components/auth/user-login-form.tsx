@@ -45,36 +45,41 @@ export function UserLoginForm() {
     // Simula uma chamada de rede e login
     setTimeout(() => {
       let loggedIn = false;
-      let registeredUser;
+      let userToLogin = null;
       
       try {
-        const storedUser = localStorage.getItem("user");
-        if (storedUser) {
-          registeredUser = JSON.parse(storedUser);
+        const storedUsers = localStorage.getItem("users");
+        const users = storedUsers ? JSON.parse(storedUsers) : [];
+
+        const foundUser = users.find((u: any) => u.email === values.email);
+
+        if (foundUser && foundUser.password === values.password) {
+          loggedIn = true;
+          userToLogin = foundUser;
+        } 
+        // Como alternativa, usa o usuário de demonstração padrão
+        else if (values.email === DEMO_USER_EMAIL && values.password === DEMO_USER_PASS) {
+          loggedIn = true;
+          userToLogin = {
+                name: "Usuário Demo",
+                email: DEMO_USER_EMAIL,
+                password: DEMO_USER_PASS,
+                avatar: null,
+                photos: []
+            };
+          // Configura o localStorage para o usuário de demonstração, se não estiver presente
+          const demoUserExists = users.some((user: any) => user.email === DEMO_USER_EMAIL);
+          if (!demoUserExists) {
+              users.push(userToLogin);
+              localStorage.setItem("users", JSON.stringify(users));
+          }
         }
       } catch (error) {
         console.error("Falha ao ler dados do localStorage", error);
       }
       
-      // Verifica primeiro se o usuário cadastrado corresponde
-      if (registeredUser && values.email === registeredUser.email && values.password === registeredUser.password) {
-        loggedIn = true;
-      } 
-      // Como alternativa, usa o usuário de demonstração padrão
-      else if (values.email === DEMO_USER_EMAIL && values.password === DEMO_USER_PASS) {
-        loggedIn = true;
-        // Configura o localStorage para o usuário de demonstração, se não estiver presente
-        if (!registeredUser || registeredUser.email !== DEMO_USER_EMAIL) {
-            localStorage.setItem("user", JSON.stringify({
-                name: "Usuário Demo",
-                email: DEMO_USER_EMAIL,
-                password: DEMO_USER_PASS,
-                avatar: null
-            }));
-        }
-      }
-
-      if (loggedIn) {
+      if (loggedIn && userToLogin) {
+        localStorage.setItem("user", JSON.stringify(userToLogin));
         toast({
           title: "Login bem-sucedido!",
           description: "Redirecionando para o bate-papo.",

@@ -42,10 +42,22 @@ export default function ProfilePage() {
 
   const updateLocalStorage = (newPhotos: string[]) => {
     try {
-      const storedUser = localStorage.getItem("user");
-      const user = storedUser ? JSON.parse(storedUser) : {};
-      user.photos = newPhotos;
-      localStorage.setItem("user", JSON.stringify(user));
+      const storedUserRaw = localStorage.getItem("user");
+      if (!storedUserRaw) return;
+      
+      const currentUser = JSON.parse(storedUserRaw);
+      currentUser.photos = newPhotos;
+      
+      localStorage.setItem("user", JSON.stringify(currentUser));
+
+      const storedUsersRaw = localStorage.getItem("users");
+      const users = storedUsersRaw ? JSON.parse(storedUsersRaw) : [];
+      const userIndex = users.findIndex((u: any) => u.email === currentUser.email);
+
+      if (userIndex > -1) {
+        users[userIndex] = currentUser;
+        localStorage.setItem("users", JSON.stringify(users));
+      }
     } catch (error) {
       console.error("Falha ao salvar fotos no localStorage", error);
       toast({
