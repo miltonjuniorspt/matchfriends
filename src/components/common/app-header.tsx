@@ -36,7 +36,7 @@ import {
 } from "@/components/ui/sheet";
 
 const navLinks = [
-  { href: "/home", label: "Início", icon: Home },
+  { href: "/home", label: "Match", icon: Home },
   { href: "/profile", label: "Álbum", icon: Album },
   { href: "/profiles", label: "Perfis", icon: Users },
   { href: "/messages", label: "Bate papo", icon: MessageSquare },
