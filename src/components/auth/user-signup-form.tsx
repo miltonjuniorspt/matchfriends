@@ -61,9 +61,9 @@ export function UserSignupForm() {
         
         toast({
           title: "Cadastro realizado com sucesso!",
-          description: "Redirecionando para a página inicial.",
+          description: "Redirecionando para o bate-papo.",
         });
-        router.push("/home");
+        router.push("/messages");
 
       } catch (error) {
         console.error("Falha ao salvar usuário no localStorage", error);

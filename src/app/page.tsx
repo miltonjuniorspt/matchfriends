@@ -8,7 +8,18 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace('/login');
+    try {
+      // Simula a verificação de um usuário salvo. Em um app real, isso viria de um contexto de autenticação ou cookie.
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        router.replace('/messages');
+      } else {
+        router.replace('/login');
+      }
+    } catch (error) {
+      // Ocorre em SSR ou se o localStorage estiver desabilitado
+      router.replace('/login');
+    }
   }, [router]);
 
   return (

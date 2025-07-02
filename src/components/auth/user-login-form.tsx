@@ -77,9 +77,9 @@ export function UserLoginForm() {
       if (loggedIn) {
         toast({
           title: "Login bem-sucedido!",
-          description: "Redirecionando para a página inicial.",
+          description: "Redirecionando para o bate-papo.",
         });
-        router.push("/home");
+        router.push("/messages");
       } else {
         toast({
           variant: "destructive",
