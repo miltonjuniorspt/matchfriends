@@ -91,7 +91,8 @@ export function AppHeader() {
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background">
       <div className="container flex h-16 items-center justify-between">
-        <div className="flex gap-6 md:gap-10">
+        {/* Left side */}
+        <div className="flex items-center gap-6">
           <Link href="/home" className="hidden items-center space-x-2 md:flex">
             <HeartHandshake className="h-6 w-6 text-primary" />
             <span className="hidden font-bold sm:inline-block font-headline">
@@ -138,7 +139,8 @@ export function AppHeader() {
           </Sheet>
         </div>
 
-        <nav className="hidden items-center gap-6 md:flex">
+        {/* Center */}
+        <nav className="hidden items-center gap-8 md:flex">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -153,6 +155,7 @@ export function AppHeader() {
             ))}
         </nav>
 
+        {/* Right side */}
         <div className="flex items-center space-x-4">
           <Button variant="ghost" size="icon">
             <Bell className="h-5 w-5" />
