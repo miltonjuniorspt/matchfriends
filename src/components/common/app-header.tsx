@@ -213,9 +213,13 @@ export function AppHeader() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end" forceMount>
-              <DropdownMenuLabel className="font-normal">
-                <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">{userName}</p>
+               <DropdownMenuLabel className="font-normal">
+                <div className="flex flex-col items-center space-y-2 p-2">
+                   <Avatar className="h-16 w-16">
+                     <AvatarImage src={userAvatar || "https://placehold.co/100x100"} alt="@user" data-ai-hint="person portrait" />
+                     <AvatarFallback>{userName.substring(0, 2).toUpperCase()}</AvatarFallback>
+                   </Avatar>
+                  <p className="text-sm font-bold leading-none">{userName}</p>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
