@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
@@ -10,19 +11,24 @@ import { Send, Search, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 
-const initialMessages = [
-  { id: 1, text: "Olá! Tudo bem? Gostei do seu perfil 😊", sender: 'other' },
-  { id: 2, text: "Oii, tudo ótimo e com você? Obrigado! Também gostei do seu.", sender: 'me' },
-  { id: 3, text: "Tudo bem também! O que você mais gosta de fazer no seu tempo livre?", sender: 'other' },
-  { id: 4, text: "Gosto muito de ir à praia, ler um bom livro e sair pra conhecer lugares novos. E você?", sender: 'me' },
-  { id: 5, text: "Que legal! 😄", sender: 'other' },
-];
+interface Message {
+    id: number;
+    text: string;
+    senderEmail: string;
+}
+
+// Helper para criar um ID de conversa consistente
+const getConversationId = (email1: string, email2: string) => {
+    return [email1, email2].sort().join('___');
+};
+
 
 export default function MessagesPage() {
-    const [messages, setMessages] = useState<any[]>([]);
+    const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const [activeConversation, setActiveConversation] = useState<any>(null);
     const [conversations, setConversations] = useState<any[]>([]);
+    const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
     const [currentUserAvatar, setCurrentUserAvatar] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -37,6 +43,7 @@ export default function MessagesPage() {
                 const allUsers = JSON.parse(storedUsersRaw);
                 const loggedInUser = JSON.parse(storedUserRaw);
                 
+                setCurrentUserEmail(loggedInUser.email);
                 setCurrentUserAvatar(loggedInUser.avatar);
 
                 const otherUsers = allUsers.filter((u: any) => u.email !== loggedInUser.email);
@@ -64,14 +71,19 @@ export default function MessagesPage() {
     }, []);
     
     useEffect(() => {
-        if (activeConversation) {
-            const dynamicMessages = initialMessages.map(msg => ({
-                ...msg,
-                sender: msg.sender === 'me' ? 'me' : activeConversation.name,
-            }));
-            setMessages(dynamicMessages);
+        if (activeConversation && currentUserEmail) {
+            try {
+                const conversationId = getConversationId(currentUserEmail, activeConversation.id);
+                const allChatsRaw = localStorage.getItem("chat_history");
+                const allChats = allChatsRaw ? JSON.parse(allChatsRaw) : {};
+                const conversationMessages = allChats[conversationId] || [];
+                setMessages(conversationMessages);
+            } catch (error) {
+                console.error("Falha ao carregar mensagens do localStorage", error);
+                setMessages([]);
+            }
         }
-    }, [activeConversation]);
+    }, [activeConversation, currentUserEmail]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -81,16 +93,28 @@ export default function MessagesPage() {
 
     const handleSendMessage = (e: React.FormEvent) => {
         e.preventDefault();
-        if (newMessage.trim() === '' || !activeConversation) return;
+        if (newMessage.trim() === '' || !activeConversation || !currentUserEmail) return;
 
-        const myMessage = {
-            id: messages.length + 1,
+        const myMessage: Message = {
+            id: Date.now(),
             text: newMessage,
-            sender: 'me',
+            senderEmail: currentUserEmail,
         };
+        
+        try {
+            const conversationId = getConversationId(currentUserEmail, activeConversation.id);
+            const allChatsRaw = localStorage.getItem("chat_history");
+            const allChats = allChatsRaw ? JSON.parse(allChatsRaw) : {};
+            const currentConversationMessages = allChats[conversationId] || [];
+            const updatedMessages = [...currentConversationMessages, myMessage];
+            allChats[conversationId] = updatedMessages;
+            localStorage.setItem("chat_history", JSON.stringify(allChats));
 
-        setMessages(prev => [...prev, myMessage]);
-        setNewMessage('');
+            setMessages(updatedMessages);
+            setNewMessage('');
+        } catch (error) {
+            console.error("Falha ao salvar mensagem no localStorage", error);
+        }
     };
 
     if (isLoading) {
@@ -174,9 +198,9 @@ export default function MessagesPage() {
                 <CardContent className="flex-1 overflow-hidden p-0">
                     <ScrollArea className="h-full">
                         <div className="space-y-6 p-4">
-                            {messages.map((msg, index) => (
-                                <div key={index} className={cn("flex w-full items-end gap-2", msg.sender === 'me' ? 'justify-end' : 'justify-start')}>
-                                    {msg.sender !== 'me' && 
+                            {messages.map((msg) => (
+                                <div key={msg.id} className={cn("flex w-full items-end gap-2", msg.senderEmail === currentUserEmail ? 'justify-end' : 'justify-start')}>
+                                    {msg.senderEmail !== currentUserEmail && 
                                         <Avatar className="h-8 w-8">
                                             <AvatarImage src={activeConversation.avatar} data-ai-hint={activeConversation.dataAiHint} />
                                             <AvatarFallback>{activeConversation.name.substring(0,2).toUpperCase()}</AvatarFallback>
@@ -184,11 +208,11 @@ export default function MessagesPage() {
                                     }
                                     <div className={cn(
                                         "max-w-[70%] rounded-lg px-4 py-2",
-                                        msg.sender === 'me' ? 'bg-primary text-primary-foreground rounded-br-none' : 'bg-muted rounded-bl-none'
+                                        msg.senderEmail === currentUserEmail ? 'bg-primary text-primary-foreground rounded-br-none' : 'bg-muted rounded-bl-none'
                                     )}>
                                         <p className="text-sm">{msg.text}</p>
                                     </div>
-                                    {msg.sender === 'me' && 
+                                    {msg.senderEmail === currentUserEmail && 
                                         <Avatar className="h-8 w-8">
                                             <AvatarImage src={currentUserAvatar || "https://placehold.co/100x100"} data-ai-hint="person portrait" />
                                             <AvatarFallback>EU</AvatarFallback>
