@@ -57,7 +57,7 @@ export function AppHeader() {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background">
-      <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
+      <div className="container flex h-16 items-center justify-between">
         <div className="flex gap-6 md:gap-10">
           <Link href="/home" className="hidden items-center space-x-2 md:flex">
             <HeartHandshake className="h-6 w-6 text-primary" />
@@ -65,21 +65,6 @@ export function AppHeader() {
               Match Friends
             </span>
           </Link>
-          <nav className="hidden gap-6 md:flex">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  "flex items-center text-sm font-medium transition-colors hover:text-foreground/80",
-                  pathname === link.href ? "text-foreground" : "text-foreground/60"
-                )}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-
           <Sheet>
             <SheetTrigger asChild>
               <Button
@@ -120,7 +105,22 @@ export function AppHeader() {
           </Sheet>
         </div>
 
-        <div className="flex flex-1 items-center justify-end space-x-2">
+        <div className="flex items-center space-x-4">
+          <nav className="hidden gap-6 md:flex">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={cn(
+                  "flex items-center text-sm font-medium transition-colors hover:text-foreground/80",
+                  pathname === link.href ? "text-foreground" : "text-foreground/60"
+                )}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+
           <Button variant="ghost" size="icon">
             <Bell className="h-5 w-5" />
             <span className="sr-only">Notificações</span>
