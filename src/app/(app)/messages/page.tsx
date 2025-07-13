@@ -53,14 +53,23 @@ export default function MessagesPage() {
                 const conversationList = otherUsers.map((user: any, index: number) => {
                     const conversationId = getConversationId(loggedInUser.email, user.email);
                     const conversationMessages = allChats[conversationId] || [];
-                    const lastMessageObj = conversationMessages[conversationMessages.length - 1];
+                    const lastMessageObj = conversationMessages.length > 0 ? conversationMessages[conversationMessages.length - 1] : null;
+
+                    let lastMessageText = "Nenhuma mensagem ainda.";
+                    if (lastMessageObj) {
+                        if (lastMessageObj.senderEmail === loggedInUser.email) {
+                            lastMessageText = `Você: ${lastMessageObj.text}`;
+                        } else {
+                            lastMessageText = lastMessageObj.text;
+                        }
+                    }
 
                     return {
                         id: user.email,
                         name: user.name,
                         avatar: user.avatar || 'https://placehold.co/100x100',
                         dataAiHint: 'person portrait',
-                        lastMessage: lastMessageObj ? lastMessageObj.text : "Nenhuma mensagem ainda.",
+                        lastMessage: lastMessageText,
                         lastMessageTime: ['10:42', 'Ontem', '2d', '3d'][index % 4],
                         online: index % 2 === 0,
                     };
@@ -123,7 +132,7 @@ export default function MessagesPage() {
             // Update conversation list with new last message
             setConversations(prev => prev.map(convo => 
                 convo.id === activeConversation.id 
-                ? { ...convo, lastMessage: myMessage.text } 
+                ? { ...convo, lastMessage: `Você: ${myMessage.text}` } 
                 : convo
             ));
 
