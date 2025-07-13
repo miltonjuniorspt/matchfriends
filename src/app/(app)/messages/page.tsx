@@ -52,16 +52,17 @@ export default function MessagesPage() {
                 
                 const conversationList = otherUsers.map((user: any, index: number) => {
                     const conversationId = getConversationId(loggedInUser.email, user.email);
-                    const conversationMessages = allChats[conversationId] || [];
-                    const lastMessageObj = conversationMessages.length > 0 ? conversationMessages[conversationMessages.length - 1] : null;
+                    const conversationMessages: Message[] = allChats[conversationId] || [];
+                    
+                    const lastMessageFromOtherUser = [...conversationMessages]
+                        .reverse()
+                        .find(msg => msg.senderEmail === user.email);
 
                     let lastMessageText = "Nenhuma mensagem ainda.";
-                    if (lastMessageObj) {
-                        if (lastMessageObj.senderEmail === loggedInUser.email) {
-                            lastMessageText = `Você: ${lastMessageObj.text}`;
-                        } else {
-                            lastMessageText = lastMessageObj.text;
-                        }
+                    if (lastMessageFromOtherUser) {
+                        lastMessageText = lastMessageFromOtherUser.text;
+                    } else if (conversationMessages.length > 0) {
+                        lastMessageText = "Você iniciou a conversa.";
                     }
 
                     return {
@@ -132,7 +133,7 @@ export default function MessagesPage() {
             // Update conversation list with new last message
             setConversations(prev => prev.map(convo => 
                 convo.id === activeConversation.id 
-                ? { ...convo, lastMessage: `Você: ${myMessage.text}` } 
+                ? { ...convo, lastMessage: "Você iniciou a conversa." } // This will be updated on next load, but good for immediate feedback
                 : convo
             ));
 
