@@ -38,6 +38,8 @@ export default function MessagesPage() {
         try {
             const storedUsersRaw = localStorage.getItem("users");
             const storedUserRaw = localStorage.getItem("user");
+            const allChatsRaw = localStorage.getItem("chat_history");
+            const allChats = allChatsRaw ? JSON.parse(allChatsRaw) : {};
 
             if (storedUsersRaw && storedUserRaw) {
                 const allUsers = JSON.parse(storedUsersRaw);
@@ -48,15 +50,21 @@ export default function MessagesPage() {
 
                 const otherUsers = allUsers.filter((u: any) => u.email !== loggedInUser.email);
                 
-                const conversationList = otherUsers.map((user: any, index: number) => ({
-                    id: user.email,
-                    name: user.name,
-                    avatar: user.avatar || 'https://placehold.co/100x100',
-                    dataAiHint: 'person portrait',
-                    lastMessage: ['Que legal! 😄', 'Combinado então!', 'hahaha, pode deixar', 'Até mais!'][index % 4],
-                    lastMessageTime: ['10:42', 'Ontem', '2d', '3d'][index % 4],
-                    online: index % 2 === 0,
-                }));
+                const conversationList = otherUsers.map((user: any, index: number) => {
+                    const conversationId = getConversationId(loggedInUser.email, user.email);
+                    const conversationMessages = allChats[conversationId] || [];
+                    const lastMessageObj = conversationMessages[conversationMessages.length - 1];
+
+                    return {
+                        id: user.email,
+                        name: user.name,
+                        avatar: user.avatar || 'https://placehold.co/100x100',
+                        dataAiHint: 'person portrait',
+                        lastMessage: lastMessageObj ? lastMessageObj.text : "Nenhuma mensagem ainda.",
+                        lastMessageTime: ['10:42', 'Ontem', '2d', '3d'][index % 4],
+                        online: index % 2 === 0,
+                    };
+                });
                 
                 setConversations(conversationList);
                 if (conversationList.length > 0) {
@@ -111,6 +119,14 @@ export default function MessagesPage() {
             localStorage.setItem("chat_history", JSON.stringify(allChats));
 
             setMessages(updatedMessages);
+
+            // Update conversation list with new last message
+            setConversations(prev => prev.map(convo => 
+                convo.id === activeConversation.id 
+                ? { ...convo, lastMessage: myMessage.text } 
+                : convo
+            ));
+
             setNewMessage('');
         } catch (error) {
             console.error("Falha ao salvar mensagem no localStorage", error);
